@@ -50,17 +50,15 @@ sub _clean_eval_closure {
     # my ($source, $__captures, $name) = @_
     my $__captures = $_[1];
 
-    do {
-        local $@;
-        local $SIG{__DIE__};
+    local $@;
+    local $SIG{__DIE__};
 
-        if ($ENV{EVAL_CLOSURE_PRINT_SOURCE}) {
-            _dump_source(_make_source(@_), $_[2]);
-        }
+    if ($ENV{EVAL_CLOSURE_PRINT_SOURCE}) {
+        _dump_source(_make_source(@_), $_[2]);
+    }
 
-        my $code = eval _make_source(@_);
-        ($code, $@);
-    };
+    my $code = eval _make_source(@_);
+    ($code, $@);
 }
 
 sub _make_source {
