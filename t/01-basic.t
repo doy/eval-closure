@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 
-use Eval::Closure 'eval_closure';
+use Eval::Closure;
 
 my $foo = [];
 

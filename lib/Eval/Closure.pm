@@ -1,6 +1,7 @@
 package Eval::Closure;
 use Sub::Exporter -setup => {
     exports => [qw(eval_closure)],
+    groups  => { default => [qw(eval_closure)] },
 };
 
 use Carp;
