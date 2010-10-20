@@ -17,6 +17,9 @@ sub eval_closure {
     $args{source} = _canonicalize_source($args{source});
     _validate_env($args{environment} ||= {});
 
+    $args{source} = _line_directive($args{description}) . $args{source}
+        if defined $args{description};
+
     my ($code, $e) = _clean_eval_closure(@args{qw(source environment name)});
 
     croak("Failed to compile source: $e\n\nsource:\n$args{source}")
@@ -63,6 +66,12 @@ sub _validate_env {
         croak("Environment values must be references, not $env->{$var}")
             unless ref($env->{$var});
     }
+}
+
+sub _line_directive {
+    my ($description) = @_;
+
+    return qq{#line 1 "$description"\n};
 }
 
 sub _clean_eval_closure {
