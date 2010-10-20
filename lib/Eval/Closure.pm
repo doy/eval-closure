@@ -47,6 +47,7 @@ sub _canonicalize_source {
 }
 
 sub _clean_eval_closure {
+    # my ($source, $__captures, $name) = @_
     my $__captures = $_[1];
 
     do {
