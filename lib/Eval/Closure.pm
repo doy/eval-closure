@@ -11,7 +11,9 @@ use Try::Tiny;
 
 sub eval_closure {
     my (%args) = @_;
+
     $args{source} = _canonicalize_source($args{source});
+    _validate_env($args{environment} ||= {});
 
     my ($code, $e) = _clean_eval_closure(@args{qw(source environment name)});
 
@@ -47,6 +49,20 @@ sub _canonicalize_source {
     }
 }
 
+sub _validate_env {
+    my ($env) = @_;
+
+    croak("The 'environment' parameter must be a hashref")
+        unless reftype($env) eq 'HASH';
+
+    for my $var (keys %$env) {
+        croak("Environment key '$_' should start with \@, \%, or \$")
+            unless $var =~ /^([\@\%\$])/;
+        croak("Environment values must be references, not $env->{$var}")
+            unless ref($env->{$var});
+    }
+}
+
 sub _clean_eval_closure {
     # my ($source, $__captures, $name) = @_
     my $__captures = $_[1];
@@ -74,10 +90,9 @@ sub _make_source {
     my ($source, $__captures) = @_;
     return join "\n", (
         (map {
-            die "Capture key should start with \@, \% or \$: $_"
-                unless /^([\@\%\$])/;
-            'my ' . $_ . ' = ' . $1 . '{$__captures->{\'' . $_ . '\'}};';
-        } keys %$__captures),
+            'my ' . $_ . ' = '
+                . substr($_, 0, 1) . '{$__captures->{\'' . $_ . '\'}};'
+         } keys %$__captures),
         $source,
     );
 }
