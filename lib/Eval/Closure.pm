@@ -1,4 +1,6 @@
 package Eval::Closure;
+use strict;
+use warnings;
 use Sub::Exporter -setup => {
     exports => [qw(eval_closure)],
     groups  => { default => [qw(eval_closure)] },
@@ -56,7 +58,7 @@ sub _validate_env {
         unless reftype($env) eq 'HASH';
 
     for my $var (keys %$env) {
-        croak("Environment key '$_' should start with \@, \%, or \$")
+        croak("Environment key '$var' should start with \@, \%, or \$")
             unless $var =~ /^([\@\%\$])/;
         croak("Environment values must be references, not $env->{$var}")
             unless ref($env->{$var});
