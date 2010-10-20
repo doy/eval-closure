@@ -77,7 +77,7 @@ sub _clean_eval_closure {
     my $code = eval _make_source(@_);
     my $e = $@;
 
-    if (!ref($code) || ref($code) ne 'CODE') {
+    if (defined($code) && (!ref($code) || ref($code) ne 'CODE')) {
         $e = "The 'source' parameter must return a subroutine reference, "
            . "not $code";
         undef $code;
