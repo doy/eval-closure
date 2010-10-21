@@ -19,7 +19,7 @@ SOURCE
 
     throws_ok {
         $code->();
-    } qr/^foo at \(eval \d+\) line 2\n/,
+    } qr/^foo at \(eval \d+\) line \d+\n/,
       "no location info if context isn't passed";
 }
 

@@ -75,18 +75,17 @@ sub _line_directive {
 }
 
 sub _clean_eval_closure {
-    # my ($source, $__captures) = @_
-    my $__captures = $_[1];
-
-    local $@;
-    local $SIG{__DIE__};
+     my ($source, $captures) = @_;
 
     if ($ENV{EVAL_CLOSURE_PRINT_SOURCE}) {
-        _dump_source(_make_source(@_));
+        _dump_source(_make_compiler_source(@_));
     }
 
-    my $code = eval _make_source(@_);
-    my $e = $@;
+    my ($compiler, $e) = _make_compiler(@_);
+    my $code;
+    if (defined $compiler) {
+        $code = $compiler->(map { $captures->{$_} } sort keys %$captures);
+    }
 
     if (defined($code) && (!ref($code) || ref($code) ne 'CODE')) {
         $e = "The 'source' parameter must return a subroutine reference, "
@@ -97,14 +96,24 @@ sub _clean_eval_closure {
     return ($code, $e);
 }
 
-sub _make_source {
-    my ($source, $__captures) = @_;
+sub _make_compiler {
+    local $@;
+    local $SIG{__DIE__};
+    my $compiler = eval _make_compiler_source(@_);
+    my $e = $@;
+    return ($compiler, $e);
+}
+
+sub _make_compiler_source {
+    my ($source, $captures) = @_;
+    my $i = 0;
     return join "\n", (
+        'sub {',
         (map {
-            'my ' . $_ . ' = '
-                . substr($_, 0, 1) . '{$__captures->{\'' . $_ . '\'}};'
-         } keys %$__captures),
+            'my ' . $_ . ' = ' . substr($_, 0, 1) . '{$_[' . $i++ . ']};'
+         } sort keys %$captures),
         $source,
+        '}',
     );
 }
 

@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Exception;
 
 use Eval::Closure;
 
@@ -33,16 +34,15 @@ use Test::Requires 'PadWalker';
 }
 
 {
-    local $TODO = "we still have to close over \$__captures";
     my $foo = [];
     my $env = { '$foo' => \$foo };
 
-    my $code = eval_closure(
-        source      => 'sub { push @$foo, @_; return $__captures }',
-        environment => $env,
-    );
-    is_deeply(scalar(PadWalker::closed_over($code)), $env,
-              "closed over the right things");
+    throws_ok {
+        my $code = eval_closure(
+            source      => 'sub { push @$foo, @_; return $__captures }',
+            environment => $env,
+        );
+    } qr/Global symbol "\$__captures/, "we don't close over \$__captures";
 }
 
 # it'd be nice if we could test that closing over other things wasn't possible,
