@@ -20,7 +20,7 @@ sub eval_closure {
     $args{source} = _line_directive($args{description}) . $args{source}
         if defined $args{description};
 
-    my ($code, $e) = _clean_eval_closure(@args{qw(source environment name)});
+    my ($code, $e) = _clean_eval_closure(@args{qw(source environment)});
 
     croak("Failed to compile source: $e\n\nsource:\n$args{source}")
         unless $code;
@@ -75,14 +75,14 @@ sub _line_directive {
 }
 
 sub _clean_eval_closure {
-    # my ($source, $__captures, $name) = @_
+    # my ($source, $__captures) = @_
     my $__captures = $_[1];
 
     local $@;
     local $SIG{__DIE__};
 
     if ($ENV{EVAL_CLOSURE_PRINT_SOURCE}) {
-        _dump_source(_make_source(@_), $_[2]);
+        _dump_source(_make_source(@_));
     }
 
     my $code = eval _make_source(@_);
@@ -109,7 +109,7 @@ sub _make_source {
 }
 
 sub _dump_source {
-    my ($source, $name) = @_;
+    my ($source) = @_;
 
     my $output;
     if (try { require Perl::Tidy }) {
@@ -122,8 +122,7 @@ sub _dump_source {
         $output = $source;
     }
 
-    $name = defined($name) ? $name : "__ANON__";
-    warn $name . ":\n" . $output . "\n";
+    warn "$output\n";
 }
 
 1;
