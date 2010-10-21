@@ -8,6 +8,7 @@ use Sub::Exporter -setup => {
 
 use Carp;
 use overload ();
+use Memoize;
 use Scalar::Util qw(reftype);
 use Try::Tiny;
 
@@ -104,6 +105,7 @@ sub _make_compiler {
     my $e = $@;
     return ($compiler, $e);
 }
+memoize('_make_compiler');
 
 sub _make_compiler_source {
     my ($source, @capture_keys) = @_;
