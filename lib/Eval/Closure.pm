@@ -82,7 +82,7 @@ sub _clean_eval_closure {
         _dump_source(_make_compiler_source(@_));
     }
 
-    my @capture_keys = keys %$captures;
+    my @capture_keys = sort keys %$captures;
     my ($compiler, $e) = _make_compiler($source, @capture_keys);
     my $code;
     if (defined $compiler) {
