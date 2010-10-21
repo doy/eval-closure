@@ -81,10 +81,11 @@ sub _clean_eval_closure {
         _dump_source(_make_compiler_source(@_));
     }
 
-    my ($compiler, $e) = _make_compiler(@_);
+    my @capture_keys = keys %$captures;
+    my ($compiler, $e) = _make_compiler($source, @capture_keys);
     my $code;
     if (defined $compiler) {
-        $code = $compiler->(map { $captures->{$_} } sort keys %$captures);
+        $code = $compiler->(@$captures{@capture_keys});
     }
 
     if (defined($code) && (!ref($code) || ref($code) ne 'CODE')) {
@@ -105,13 +106,13 @@ sub _make_compiler {
 }
 
 sub _make_compiler_source {
-    my ($source, $captures) = @_;
+    my ($source, @capture_keys) = @_;
     my $i = 0;
     return join "\n", (
         'sub {',
         (map {
             'my ' . $_ . ' = ' . substr($_, 0, 1) . '{$_[' . $i++ . ']};'
-         } sort keys %$captures),
+         } @capture_keys),
         $source,
         '}',
     );
