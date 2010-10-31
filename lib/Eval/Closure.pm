@@ -5,12 +5,23 @@ use Sub::Exporter -setup => {
     exports => [qw(eval_closure)],
     groups  => { default => [qw(eval_closure)] },
 };
+# ABSTRACT: safely and cleanly create closures via string eval
 
 use Carp;
 use overload ();
 use Memoize;
 use Scalar::Util qw(reftype);
 use Try::Tiny;
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut
+
+=func eval_closure(%args)
+
+=cut
 
 sub eval_closure {
     my (%args) = @_;
@@ -136,5 +147,60 @@ sub _dump_source {
 
     warn "$output\n";
 }
+
+=head1 BUGS
+
+No known bugs.
+
+Please report any bugs through RT: email
+C<bug-eval-closure at rt.cpan.org>, or browse to
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Eval-Closure>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Class::MOP::Method::Accessor>
+
+This module is a factoring out of code that used to live here
+
+=back
+
+=head1 SUPPORT
+
+You can find this documentation for this module with the perldoc command.
+
+    perldoc Eval::Closure
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Eval-Closure>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Eval-Closure>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Eval-Closure>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Eval-Closure>
+
+=back
+
+=head1 AUTHOR
+
+Jesse Luehrs <doy at tozt dot net>
+
+Based on code from L<Class::MOP::Method::Accessor>, by Stevan Little and the
+Moose Cabal.
+
+=cut
 
 1;
