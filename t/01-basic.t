@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 use Eval::Closure;
 
@@ -12,7 +12,7 @@ use Eval::Closure;
     );
     ok($code, "got something");
 
-    throws_ok { $code->() } qr/^called$/, "got the right thing";
+    like(exception { $code->() }, qr/^called$/, "got the right thing");
 }
 
 {

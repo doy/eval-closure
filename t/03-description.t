@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 use Eval::Closure;
 
@@ -17,10 +17,11 @@ SOURCE
         source => $source,
     );
 
-    throws_ok {
-        $code->();
-    } qr/^foo at \(eval \d+\) line \d+\n/,
-      "no location info if context isn't passed";
+    like(
+        exception { $code->() },
+        qr/^foo at \(eval \d+\) line \d+\n/,
+        "no location info if context isn't passed"
+    );
 }
 
 {
@@ -29,10 +30,11 @@ SOURCE
         description => 'accessor foo (defined at Class.pm line 282)',
     );
 
-    throws_ok {
-        $code->();
-    } qr/^foo at accessor foo \(defined at Class\.pm line 282\) line 2\n/,
-      "description is set";
+    like(
+        exception { $code->() },
+        qr/^foo at accessor foo \(defined at Class\.pm line 282\) line 2\n/,
+        "description is set"
+    );
 }
 
 done_testing;

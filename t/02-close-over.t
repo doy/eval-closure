@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Exception;
+use Test::Fatal;
 
 use Eval::Closure;
 
@@ -37,12 +37,16 @@ use Test::Requires 'PadWalker';
     my $foo = [];
     my $env = { '$foo' => \$foo };
 
-    throws_ok {
-        my $code = eval_closure(
-            source      => 'sub { push @$foo, @_; return $__captures }',
-            environment => $env,
-        );
-    } qr/Global symbol "\$__captures/, "we don't close over \$__captures";
+    like(
+        exception {
+            eval_closure(
+                source      => 'sub { push @$foo, @_; return $__captures }',
+                environment => $env,
+            );
+        },
+        qr/Global symbol "\$__captures/,
+        "we don't close over \$__captures"
+    );
 }
 
 # it'd be nice if we could test that closing over other things wasn't possible,
