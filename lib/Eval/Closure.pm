@@ -15,11 +15,73 @@ use Try::Tiny;
 
 =head1 SYNOPSIS
 
+  use Eval::Closure;
+
+  my $code = eval_closure(
+      source      => 'sub { $foo++ }',
+      environment => {
+          '$foo' => \1,
+      },
+  );
+
+  warn $code->(); # 1
+  warn $code->(); # 2
+
+  my $code2 = eval_closure(
+      source => 'sub { $code->() }',
+  ); # dies, $code isn't in scope
+
 =head1 DESCRIPTION
+
+String eval is often used for dynamic code generation. For instance, C<Moose>
+uses it heavily, to generate inlined versions of accessors and constructors,
+which speeds code up at runtime by a significant amount. String eval is not
+without its issues however - it's difficult to control the scope it's used in
+(which determines which variables are in scope inside the eval), and it can be
+quite slow, especially if doing a large number of evals.
+
+This module attempts to solve both of those problems. It provides an
+C<eval_closure> function, which evals a string in a clean environment, other
+than a fixed list of specified variables. It also caches the result of the
+eval, so that doing repeated evals of the same source (even with a different
+environment) will be much faster.
 
 =cut
 
 =func eval_closure(%args)
+
+This function provides the main functionality of this module. It is exported by
+default. It takes a hash of parameters, with these keys being valid:
+
+=over 4
+
+=item source
+
+The string to be evaled. It should end by returning a code reference. It can
+access any variable declared in the C<environment> parameter (and only those
+variables). It can be either a string, or an arrayref of lines (which will be
+joined with newlines to produce the string).
+
+=item environment
+
+The environment to provide to the eval. This should be a hashref, mapping
+variable names (including sigils) to references of the appropriate type. For
+instance, a valid value for environment would be C<< { '@foo' => [] } >> (which
+would allow the generated function to use an array named C<@foo>). Generally,
+this is used to allow the generated function to access externally defined
+variables (so you would pass in a reference to a variable that already exists).
+
+=item description
+
+This lets you provide a bit more information in backtraces. Normally, when a
+function that was generated through string eval is called, that stack frame
+will show up as "(eval n)", where 'n' is a sequential identifier for every
+string eval that has happened so far in the program. Passing a C<description>
+parameter lets you override that to something more useful (for instance,
+L<Moose> overrides the description for accessors to something like "accessor
+foo at MyClass.pm, like 123").
+
+=back
 
 =cut
 
