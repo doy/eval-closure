@@ -43,8 +43,10 @@ quite slow, especially if doing a large number of evals.
 This module attempts to solve both of those problems. It provides an
 C<eval_closure> function, which evals a string in a clean environment, other
 than a fixed list of specified variables. It also caches the result of the
-eval, so that doing repeated evals of the same source (even with a different
-environment) will be much faster.
+eval, so that doing repeated evals of the same source, even with a different
+environment, will be much faster (but note that the description is part of the
+string to be evaled, so it must also be the same (or non-existent) if caching
+is to work properly).
 
 =cut
 
