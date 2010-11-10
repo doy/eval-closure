@@ -23,7 +23,6 @@ use Eval::Closure;
         environment => {
             '$bar' => \$foo,
         },
-        name        => 'test',
     );
     ok($code, "got something");
 
