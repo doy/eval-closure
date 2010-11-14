@@ -8,13 +8,10 @@ use Sub::Exporter -setup => {
 # ABSTRACT: safely and cleanly create closures via string eval
 
 use Carp;
-use Devel::Hints qw(cop_file cop_line);
 use overload ();
 use Memoize;
 use Scalar::Util qw(reftype);
 use Try::Tiny;
-
-use constant USE_DEVEL_HINTS => ($] >= 5.010);
 
 =head1 SYNOPSIS
 
@@ -96,22 +93,13 @@ sub eval_closure {
     $args{source} = _canonicalize_source($args{source});
     _validate_env($args{environment} ||= {});
 
-    if (!USE_DEVEL_HINTS) {
-        $args{source} = _line_directive($args{description}) . $args{source}
-            if defined $args{description};
-    }
+    $args{source} = _line_directive($args{description}) . $args{source}
+        if defined $args{description};
 
     my ($code, $e) = _clean_eval_closure(@args{qw(source environment)});
 
     croak("Failed to compile source: $e\n\nsource:\n$args{source}")
         unless $code;
-
-    if (USE_DEVEL_HINTS) {
-        if (defined $args{description}) {
-            cop_file($code, $args{description});
-            cop_line($code, 1);
-        }
-    }
 
     return $code;
 }
@@ -159,7 +147,7 @@ sub _validate_env {
 sub _line_directive {
     my ($description) = @_;
 
-    return qq{#line 0 "$description"\n};
+    return qq{#line 1 "$description"\n};
 }
 
 sub _clean_eval_closure {

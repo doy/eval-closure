@@ -32,7 +32,7 @@ SOURCE
 
     like(
         exception { $code->() },
-        qr/^foo at accessor foo \(defined at Class\.pm line 282\) line 1\n/,
+        qr/^foo at accessor foo \(defined at Class\.pm line 282\) line 2\n/,
         "description is set"
     );
 }

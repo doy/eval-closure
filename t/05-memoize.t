@@ -8,12 +8,7 @@ use Test::Requires 'Test::Output';
 use Eval::Closure;
 
 {
-    my $source = <<'SOURCE';
-    sub {
-        $foo * 2;
-    };
-    BEGIN { warn "foo\n" }
-SOURCE
+    my $source = 'BEGIN { warn "foo\n" } sub { $foo * 2 }';
 
     my $code;
     my $bar = 15;
@@ -43,12 +38,7 @@ SOURCE
 }
 
 {
-    my $source = <<'SOURCE';
-    sub {
-        $bar * 2;
-    };
-    BEGIN { warn "bar\n" }
-SOURCE
+    my $source = 'BEGIN { warn "bar\n" } sub { $bar * 2 }';
 
     my $code;
     my $foo = 60;
@@ -66,8 +56,7 @@ SOURCE
 
     my $code2;
     my $baz = 23;
-    { local $TODO = $] < 5.010 ? "description breaks memoization on 5.8"
-                               : undef;
+    { local $TODO = "description breaks memoization";
     stderr_is {
         $code2 = eval_closure(
             source      => $source,
@@ -83,12 +72,7 @@ SOURCE
 }
 
 {
-    my $source = <<'SOURCE';
-    sub {
-        Carp::confess "baz";
-    };
-    BEGIN { warn "baz\n" }
-SOURCE
+    my $source = 'BEGIN { warn "baz\n" } sub { Carp::confess "baz" }';
 
     my $code;
     stderr_is {
@@ -102,8 +86,7 @@ SOURCE
          "got the right description");
 
     my $code2;
-    { local $TODO = $] < 5.010 ? "description breaks memoization on 5.8"
-                               : undef;
+    { local $TODO = "description breaks memoization";
     stderr_is {
         $code2 = eval_closure(
             source      => $source,
