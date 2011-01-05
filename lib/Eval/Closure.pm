@@ -81,7 +81,7 @@ will show up as "(eval n)", where 'n' is a sequential identifier for every
 string eval that has happened so far in the program. Passing a C<description>
 parameter lets you override that to something more useful (for instance,
 L<Moose> overrides the description for accessors to something like "accessor
-foo at MyClass.pm, like 123").
+foo at MyClass.pm, line 123").
 
 =back
 
