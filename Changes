@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+
+0.02  2011-01-26
       - add terse_error option for throwing only the actual compilation error
         (Shawn M Moore)
       - allow also specifying the line number for error reporting
