@@ -83,6 +83,11 @@ parameter lets you override that to something more useful (for instance,
 L<Moose> overrides the description for accessors to something like "accessor
 foo at MyClass.pm, line 123").
 
+=item line
+
+This lets you override the particular line number that appears in backtraces,
+much like the description option. The default is "1".
+
 =item terse_error
 
 Normally, this function appends the source code that failed to compile, and
@@ -99,7 +104,7 @@ sub eval_closure {
     $args{source} = _canonicalize_source($args{source});
     _validate_env($args{environment} ||= {});
 
-    $args{source} = _line_directive($args{description}) . $args{source}
+    $args{source} = _line_directive(@args{qw(line description)}) . $args{source}
         if defined $args{description};
 
     my ($code, $e) = _clean_eval_closure(@args{qw(source environment)});
@@ -157,9 +162,11 @@ sub _validate_env {
 }
 
 sub _line_directive {
-    my ($description) = @_;
+    my ($line, $description) = @_;
 
-    return qq{#line 1 "$description"\n};
+    $line = 1 if !defined($line);
+
+    return qq{#line $line "$description"\n};
 }
 
 sub _clean_eval_closure {

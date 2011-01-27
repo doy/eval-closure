@@ -37,4 +37,17 @@ SOURCE
     );
 }
 
+{
+    my $code = eval_closure(
+        source      => $source,
+        line        => 100,
+        description => 'accessor foo (defined at Class.pm line 282)',
+    );
+
+    like(
+        exception { $code->() },
+        qr/^foo at accessor foo \(defined at Class\.pm line 282\) line 101\n/,
+        "description is set"
+    );
+}
 done_testing;
