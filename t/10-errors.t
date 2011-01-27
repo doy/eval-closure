@@ -52,4 +52,16 @@ like(
     "gives us compile errors properly"
 );
 
+like(
+    exception { eval_closure(source => 'sub { $x }') },
+    qr/sub \s* { \s* \$x \s* }/x,
+    "without terse_error, includes the source code"
+);
+
+unlike(
+    exception { eval_closure(source => 'sub { $x }', terse_error => 1) },
+    qr/sub \s* { \s* \$x \s* }/x,
+    "with terse_error, does not include the source code"
+);
+
 done_testing;

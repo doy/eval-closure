@@ -83,6 +83,12 @@ parameter lets you override that to something more useful (for instance,
 L<Moose> overrides the description for accessors to something like "accessor
 foo at MyClass.pm, line 123").
 
+=item terse_error
+
+Normally, this function appends the source code that failed to compile, and
+prepends some explanatory text. Setting this option to true suppresses that
+behavior so you get only the compilation error that Perl actually reported.
+
 =back
 
 =cut
@@ -98,8 +104,14 @@ sub eval_closure {
 
     my ($code, $e) = _clean_eval_closure(@args{qw(source environment)});
 
-    croak("Failed to compile source: $e\n\nsource:\n$args{source}")
-        unless $code;
+    if (!$code) {
+        if ($args{terse_error}) {
+            die "$e\n";
+        }
+        else {
+            croak("Failed to compile source: $e\n\nsource:\n$args{source}")
+        }
+    }
 
     return $code;
 }
