@@ -86,7 +86,7 @@ foo at MyClass.pm, line 123").
 =item line
 
 This lets you override the particular line number that appears in backtraces,
-much like the description option. The default is "1".
+much like the C<description> option. The default is 1.
 
 =item terse_error
 
@@ -104,7 +104,8 @@ sub eval_closure {
     $args{source} = _canonicalize_source($args{source});
     _validate_env($args{environment} ||= {});
 
-    $args{source} = _line_directive(@args{qw(line description)}) . $args{source}
+    $args{source} = _line_directive(@args{qw(line description)})
+                  . $args{source}
         if defined $args{description};
 
     my ($code, $e) = _clean_eval_closure(@args{qw(source environment)});
@@ -164,7 +165,7 @@ sub _validate_env {
 sub _line_directive {
     my ($line, $description) = @_;
 
-    $line = 1 if !defined($line);
+    $line = 1 unless defined($line);
 
     return qq{#line $line "$description"\n};
 }
