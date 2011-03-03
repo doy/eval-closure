@@ -106,7 +106,7 @@ sub eval_closure {
 
     $args{source} = _line_directive(@args{qw(line description)})
                   . $args{source}
-        if defined $args{description};
+        if defined $args{description} && !($^P & 0x10);
 
     my ($code, $e) = _clean_eval_closure(@args{qw(source environment)});
 
