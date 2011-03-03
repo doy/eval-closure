@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+
+0.03  2011-03-02
       - don't add #line directives when the debugger is active (alh)
 
 0.02  2011-01-26
