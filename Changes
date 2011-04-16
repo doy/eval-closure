@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+
+0.04  2011-04-15
       - stop using Memoize, it apparently doesn't work properly under mod_perl
         in some situations (mateu)
 
