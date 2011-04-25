@@ -231,6 +231,7 @@ sub _dump_source {
         Perl::Tidy::perltidy(
             source      => \$source,
             destination => \$output,
+            argv        => [],
         );
     }
     else {
