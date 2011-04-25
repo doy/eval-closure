@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+
+0.05  2011-04-25
       - make sure Perl::Tidy doesn't look at @ARGV (rafl)
 
 0.04  2011-04-15
