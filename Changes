@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+      - The dumped source from setting $ENV{EVAL_CLOSURE_PRINT_SOURCE} didn't
+        show the captured variable creation properly. (Dave Rolsky)
 
 0.05  2011-04-25
       - make sure Perl::Tidy doesn't look at @ARGV (rafl)
