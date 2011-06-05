@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+
+0.06  2011-06-05
       - The dumped source from setting $ENV{EVAL_CLOSURE_PRINT_SOURCE} didn't
         show the captured variable creation properly. (Dave Rolsky)
 
