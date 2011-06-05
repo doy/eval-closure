@@ -170,7 +170,7 @@ sub _line_directive {
 }
 
 sub _clean_eval_closure {
-     my ($source, $captures) = @_;
+    my ($source, $captures) = @_;
 
     my @capture_keys = sort keys %$captures;
 
