@@ -207,14 +207,18 @@ sub _clean_eval_closure {
     }
 }
 
+$Eval::Closure::SANDBOX_ID = 0;
+
 sub _clean_eval {
-    package # hide from PAUSE
-        Eval::Closure::Sandbox;
-    local $@;
-    local $SIG{__DIE__};
-    my $compiler = eval $_[0];
-    my $e = $@;
-    return [ $compiler, $e ];
+    $Eval::Closure::SANDBOX_ID++;
+    return eval <<EVAL;
+package Eval::Closure::Sandbox_$Eval::Closure::SANDBOX_ID;
+local \$@;
+local \$SIG{__DIE__};
+my \$compiler = eval \$_[0];
+my \$e = \$@;
+[ \$compiler, \$e ];
+EVAL
 }
 
 sub _make_compiler_source {
