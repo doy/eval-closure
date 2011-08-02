@@ -202,7 +202,11 @@ sub _clean_eval_closure {
         unless (exists $compiler_cache{$source}) {
             local $@;
             local $SIG{__DIE__};
-            my $compiler = eval $source;
+            my $compiler = do {
+                package # hide from PAUSE
+                    Eval::Closure::Sandbox;
+                eval $source;
+            };
             my $e = $@;
             $compiler_cache{$source} = [ $compiler, $e ];
         }
