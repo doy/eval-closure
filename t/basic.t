@@ -35,8 +35,6 @@ use Eval::Closure;
     my $foo = [1, 2, 3];
 
     my $code = eval_closure(
-        # not sure if strict leaking into evals is intended, i think i remember
-        # it being changed in newer perls
         source => 'do { no strict; sub { $foo } }',
     );
 

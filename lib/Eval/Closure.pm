@@ -192,8 +192,9 @@ sub _clean_eval_closure {
 
 sub _make_compiler {
     my $source = _make_compiler_source(@_);
+    my @caller = caller(2); # XXX make sure this stays in sync
 
-    return @{ _clean_eval($source) };
+    return @{ _clean_eval($source, $caller[8]) };
 }
 
 $Eval::Closure::SANDBOX_ID = 0;
@@ -204,6 +205,7 @@ sub _clean_eval {
 package Eval::Closure::Sandbox_$Eval::Closure::SANDBOX_ID;
 local \$@;
 local \$SIG{__DIE__};
+BEGIN { \$^H = $_[1] }
 my \$compiler = eval \$_[0];
 my \$e = \$@;
 [ \$compiler, \$e ];
