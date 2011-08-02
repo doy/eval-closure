@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
+use B;
 use Eval::Closure;
 
 use Test::Requires 'PadWalker';
@@ -34,22 +35,38 @@ use Test::Requires 'PadWalker';
 }
 
 {
-    my $foo = [];
-    my $env = { '$foo' => \$foo };
+    # i feel dirty
+    my $c = eval_closure(source => 'sub { }');
+    my $b = B::svref_2object($c);
+    my @scopes;
+    while ($b->isa('B::CV')) {
+        push @scopes, $b;
+        $b = $b->OUTSIDE;
+    }
+    my @visible_in_outer_scope
+        = grep { $_ ne '&' }
+          map  { $_->PV }
+          grep { $_->isa('B::PV') }
+          map  { $_->PADLIST->ARRAYelt(0)->ARRAY }
+          @scopes;
 
-    like(
-        exception {
-            eval_closure(
-                source      => 'sub { push @$foo, @_; return $__captures }',
-                environment => $env,
-            );
-        },
-        qr/Global symbol "\$__captures/,
-        "we don't close over \$__captures"
-    );
+    # test to ensure we don't inadvertently screw up this test by rearranging
+    # code. if the scope that encloses the eval ends up not declaring $e, then
+    # change this test.
+    ok(scalar(grep { $_ eq '$e' } @visible_in_outer_scope),
+       "visible list is sane");
+
+    for my $outer_scope_pad_entry (@visible_in_outer_scope) {
+        like(
+            exception {
+                eval_closure(
+                    source => "sub { $outer_scope_pad_entry }",
+                );
+            },
+            qr/Global symbol "\Q$outer_scope_pad_entry/,
+            "we don't close over $outer_scope_pad_entry"
+        );
+    }
 }
-
-# it'd be nice if we could test that closing over other things wasn't possible,
-# but perl's optimizer gets in the way of that
 
 done_testing;

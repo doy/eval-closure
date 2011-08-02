@@ -200,19 +200,21 @@ sub _clean_eval_closure {
         my $source = _make_compiler_source(@_);
 
         unless (exists $compiler_cache{$source}) {
-            local $@;
-            local $SIG{__DIE__};
-            my $compiler = do {
-                package # hide from PAUSE
-                    Eval::Closure::Sandbox;
-                eval $source;
-            };
-            my $e = $@;
-            $compiler_cache{$source} = [ $compiler, $e ];
+            $compiler_cache{$source} = _clean_eval($source);
         }
 
         return @{ $compiler_cache{$source} };
     }
+}
+
+sub _clean_eval {
+    package # hide from PAUSE
+        Eval::Closure::Sandbox;
+    local $@;
+    local $SIG{__DIE__};
+    my $compiler = eval $_[0];
+    my $e = $@;
+    return [ $compiler, $e ];
 }
 
 sub _make_compiler_source {
