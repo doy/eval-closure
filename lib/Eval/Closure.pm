@@ -36,16 +36,11 @@ String eval is often used for dynamic code generation. For instance, C<Moose>
 uses it heavily, to generate inlined versions of accessors and constructors,
 which speeds code up at runtime by a significant amount. String eval is not
 without its issues however - it's difficult to control the scope it's used in
-(which determines which variables are in scope inside the eval), and it can be
-quite slow, especially if doing a large number of evals.
+(which determines which variables are in scope inside the eval).
 
-This module attempts to solve both of those problems. It provides an
-C<eval_closure> function, which evals a string in a clean environment, other
-than a fixed list of specified variables. It also caches the result of the
-eval, so that doing repeated evals of the same source, even with a different
-environment, will be much faster (but note that the description is part of the
-string to be evaled, so it must also be the same (or non-existent) if caching
-is to work properly).
+This module attempts to solve this problem. It provides an C<eval_closure>
+function, which evals a string in a clean environment, other than a fixed list
+of specified variables.
 
 =cut
 
@@ -193,18 +188,10 @@ sub _clean_eval_closure {
     return ($code, $e);
 }
 
-{
-    my %compiler_cache;
+sub _make_compiler {
+    my $source = _make_compiler_source(@_);
 
-    sub _make_compiler {
-        my $source = _make_compiler_source(@_);
-
-        unless (exists $compiler_cache{$source}) {
-            $compiler_cache{$source} = _clean_eval($source);
-        }
-
-        return @{ $compiler_cache{$source} };
-    }
+    return @{ _clean_eval($source) };
 }
 
 $Eval::Closure::SANDBOX_ID = 0;

@@ -31,4 +31,14 @@ use Eval::Closure;
     is($c2->(), -2);
 }
 
+{
+    my $source = 'no strict "vars"; sub { ++$foo }';
+    my $c1 = eval_closure(source => $source);
+    my $c2 = eval_closure(source => $source);
+    is($c1->(), 1);
+    is($c1->(), 2);
+    is($c2->(), 1);
+    is($c2->(), 2);
+}
+
 done_testing;

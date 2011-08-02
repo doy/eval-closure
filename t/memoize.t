@@ -7,6 +7,12 @@ use Test::Requires 'Test::Output';
 
 use Eval::Closure;
 
+# XXX this whole test isn't very useful anymore, since we no longer do
+# memoization. it would be nice to bring it back at some point though, if there
+# was a way to do this without breaking the other tests
+
+plan skip_all => "disabling this test for now";
+
 {
     my $source = 'BEGIN { warn "foo\n" } sub { $foo * 2 }';
 
