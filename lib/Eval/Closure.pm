@@ -196,12 +196,8 @@ sub _make_compiler {
     return @{ _clean_eval($source) };
 }
 
-$Eval::Closure::SANDBOX_ID = 0;
-
 sub _clean_eval {
-    $Eval::Closure::SANDBOX_ID++;
     return eval <<EVAL;
-package Eval::Closure::Sandbox_$Eval::Closure::SANDBOX_ID;
 local \$@;
 local \$SIG{__DIE__};
 my \$compiler = eval \$_[0];
@@ -210,10 +206,14 @@ my \$e = \$@;
 EVAL
 }
 
+$Eval::Closure::SANDBOX_ID = 0;
+
 sub _make_compiler_source {
     my ($source, @capture_keys) = @_;
+    $Eval::Closure::SANDBOX_ID++;
     my $i = 0;
     return join "\n", (
+        "package Eval::Closure::Sandbox_$Eval::Closure::SANDBOX_ID;",
         'sub {',
         (map {
             'my ' . $_ . ' = ' . substr($_, 0, 1) . '{$_[' . $i++ . ']};'
