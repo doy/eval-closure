@@ -19,7 +19,7 @@ SOURCE
 
     like(
         exception { $code->() },
-        qr/^foo at \(eval \d+\) line \d+\n/,
+        qr/^foo at \(eval \d+\) line \d+/,
         "no location info if context isn't passed"
     );
 }
@@ -32,7 +32,7 @@ SOURCE
 
     like(
         exception { $code->() },
-        qr/^foo at accessor foo \(defined at Class\.pm line 282\) line 2\n/,
+        qr/^foo at accessor foo \(defined at Class\.pm line 282\) line 2/,
         "description is set"
     );
 }
@@ -46,7 +46,7 @@ SOURCE
 
     like(
         exception { $code->() },
-        qr/^foo at accessor foo \(defined at Class\.pm line 282\) line 101\n/,
+        qr/^foo at accessor foo \(defined at Class\.pm line 282\) line 101/,
         "description is set"
     );
 }
