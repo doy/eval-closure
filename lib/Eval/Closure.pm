@@ -197,13 +197,11 @@ sub _make_compiler {
 }
 
 sub _clean_eval {
-    return eval <<EVAL;
-local \$@;
-local \$SIG{__DIE__};
-my \$compiler = eval \$_[0];
-my \$e = \$@;
-[ \$compiler, \$e ];
-EVAL
+    local $@;
+    local $SIG{__DIE__};
+    my $compiler = eval $_[0];
+    my $e = $@;
+    [ $compiler, $e ];
 }
 
 $Eval::Closure::SANDBOX_ID = 0;
