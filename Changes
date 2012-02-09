@@ -1,6 +1,10 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+      - Remove a double layer of string eval that was introduced in 0.07 as an
+        intermediate step in figuring out the unique package thing - it's not
+        necessary with the final implementation, and just makes things slower
+        and hides errors.
 
 0.07  2012-02-03
       - the given source is now evaled in a unique package for every
