@@ -100,11 +100,22 @@ sub eval_closure {
     $args{source} = _canonicalize_source($args{source});
     _validate_env($args{environment} ||= {});
 
+    my $should_set_description = defined $args{description} && !($^P & 0x10);
+
     $args{source} = _line_directive(@args{qw(line description)})
                   . $args{source}
-        if defined $args{description} && !($^P & 0x10);
+        if $should_set_description;
+
+    my $existed_before;
+    $existed_before = exists $::{"_<$args{description}"}
+        if $should_set_description;
 
     my ($code, $e) = _clean_eval_closure(@args{qw(source environment)});
+
+    if (!$existed_before && $should_set_description) {
+        # this will be meaningless, and just leaks memory
+        delete $::{"_<$args{description}"};
+    }
 
     if (!$code) {
         if ($args{terse_error}) {
