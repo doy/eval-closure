@@ -202,9 +202,20 @@ sub _clean_eval_closure {
 }
 
 sub _make_compiler {
-    my $source = _make_compiler_source(@_);
+    my $package = _next_package();
+    my $source = _make_compiler_source($package, @_);
+    my @ret = @{ _clean_eval($source) };
+    {
+        my ($first_fragments, $last_fragment) = ($package =~ /^(.*)::(.*)$/);
 
-    return @{ _clean_eval($source) };
+        no strict 'refs';
+        # clear @ISA first, to avoid a memory leak
+        # see https://rt.perl.org/rt3/Public/Bug/Display.html?id=92708
+        @{$package . '::ISA'} = ();
+        %{$package . '::'}    = ();
+        delete ${$first_fragments . '::'}{$last_fragment . '::'};
+    }
+    return @ret;
 }
 
 sub _clean_eval {
@@ -215,14 +226,20 @@ sub _clean_eval {
     [ $compiler, $e ];
 }
 
-$Eval::Closure::SANDBOX_ID = 0;
+{
+    $Eval::Closure::SANDBOX_ID = 0;
+
+    sub _next_package {
+        $Eval::Closure::SANDBOX_ID++;
+        return "Eval::Closure::Sandbox_$Eval::Closure::SANDBOX_ID";
+    }
+}
 
 sub _make_compiler_source {
-    my ($source, @capture_keys) = @_;
-    $Eval::Closure::SANDBOX_ID++;
+    my ($package, $source, @capture_keys) = @_;
     my $i = 0;
     return join "\n", (
-        "package Eval::Closure::Sandbox_$Eval::Closure::SANDBOX_ID;",
+        "package $package;",
         'sub {',
         (map {
             'my ' . $_ . ' = ' . substr($_, 0, 1) . '{$_[' . $i++ . ']};'
