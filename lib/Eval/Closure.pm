@@ -1,11 +1,10 @@
 package Eval::Closure;
 use strict;
 use warnings;
-use Sub::Exporter -setup => {
-    exports => [qw(eval_closure)],
-    groups  => { default => [qw(eval_closure)] },
-};
 # ABSTRACT: safely and cleanly create closures via string eval
+
+use Exporter 'import';
+@Eval::Closure::EXPORT = @Eval::Closure::EXPORT_OK = 'eval_closure';
 
 use Carp;
 use overload ();
