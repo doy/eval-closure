@@ -12,6 +12,8 @@ use overload ();
 use Scalar::Util qw(reftype);
 use Try::Tiny;
 
+use constant HAS_LEXICAL_SUBS => $] >= 5.018;
+
 =head1 SYNOPSIS
 
   use Eval::Closure;
@@ -68,6 +70,11 @@ instance, a valid value for environment would be C<< { '@foo' => [] } >> (which
 would allow the generated function to use an array named C<@foo>). Generally,
 this is used to allow the generated function to access externally defined
 variables (so you would pass in a reference to a variable that already exists).
+
+In perl 5.18 and greater, the environment hash can contain variables with a
+sigil of C<&>. This will create a lexical sub in the evaluated code (see
+L<feature/The 'lexical_subs' feature>). Using a C<&> sigil on perl versions
+before lexical subs were available will throw an error.
 
 =item description
 
@@ -151,8 +158,14 @@ sub _validate_env {
         unless reftype($env) eq 'HASH';
 
     for my $var (keys %$env) {
-        croak("Environment key '$var' should start with \@, \%, or \$")
-            unless $var =~ /^([\@\%\$])/;
+        if (HAS_LEXICAL_SUBS) {
+            croak("Environment key '$var' should start with \@, \%, \$, or \&")
+                unless $var =~ /^([\@\%\$\&])/;
+        }
+        else {
+            croak("Environment key '$var' should start with \@, \%, or \$")
+                unless $var =~ /^([\@\%\$])/;
+        }
         croak("Environment values must be references, not $env->{$var}")
             unless ref($env->{$var});
     }
@@ -213,12 +226,26 @@ sub _make_compiler_source {
     return join "\n", (
         "package Eval::Closure::Sandbox_$Eval::Closure::SANDBOX_ID;",
         'sub {',
-        (map {
-            'my ' . $_ . ' = ' . substr($_, 0, 1) . '{$_[' . $i++ . ']};'
-         } @capture_keys),
-        $source,
+            (map { _make_lexical_assignment($_, $i++) } @capture_keys),
+            $source,
         '}',
     );
+}
+
+sub _make_lexical_assignment {
+    my ($key, $index) = @_;
+    my $sigil = substr($key, 0, 1);
+    my $name = substr($key, 1);
+    if (HAS_LEXICAL_SUBS && $sigil eq '&') {
+        my $tmpname = '$__' . $name . '__' . $index;
+        return 'use feature "lexical_subs"; '
+             . 'no warnings "experimental::lexical_subs"; '
+             . 'my ' . $tmpname . ' = $_[' . $index . ']; '
+             . 'my sub ' . $name . ' { goto ' . $tmpname . ' }';
+    }
+    else {
+        return 'my ' . $key . ' = ' . $sigil . '{$_[' . $index . ']};';
+    }
 }
 
 sub _dump_source {

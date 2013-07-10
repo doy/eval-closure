@@ -31,7 +31,7 @@ like(
             environment => { 'foo' => \1 },
         )
     },
-    qr/should start with \@, \%, or \$/,
+    qr/should start with \@, \%,/,
     "error from malformed env"
 );
 
