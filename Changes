@@ -1,6 +1,7 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+      - support lexical subs on 5.18+
 
 0.08  2012-02-09
       - Remove a double layer of string eval that was introduced in 0.07 as an
