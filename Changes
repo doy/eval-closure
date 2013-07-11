@@ -1,6 +1,7 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+      - fix pod links
 
 0.09  2013-07-10
       - support lexical subs on 5.18+
