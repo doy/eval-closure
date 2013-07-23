@@ -243,7 +243,7 @@ sub _make_lexical_assignment {
              . 'my sub ' . $name . ' { goto ' . $tmpname . ' }';
     }
     else {
-        return 'my ' . $key . ' = ' . $sigil . '{$_[' . $index . ']};';
+        return 'our ' . $key . '; *' . $name . ' = $_[' . $index . '];';
     }
 }
 
