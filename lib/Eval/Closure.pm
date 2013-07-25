@@ -269,7 +269,8 @@ sub _dump_source {
 
 No known bugs.
 
-Please report any bugs to GitHub Issues at L<https://github.com/doy/eval-closure/issues>.
+Please report any bugs to GitHub Issues at
+L<https://github.com/doy/eval-closure/issues>.
 
 =head1 SEE ALSO
 
