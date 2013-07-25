@@ -8,11 +8,11 @@ use Exporter 'import';
 
 use Carp;
 use overload ();
+use Devel::LexAlias ();
 use Scalar::Util qw(reftype);
 use Try::Tiny;
 
-use constant HAS_LEXICAL_SUBS   => $] >= 5.018;
-use constant HAS_DEVEL_LEXALIAS => eval { require Devel::LexAlias };
+use constant HAS_LEXICAL_SUBS => $] >= 5.018;
 
 =head1 SYNOPSIS
 
@@ -200,7 +200,7 @@ sub _clean_eval_closure {
         undef $code;
     }
 
-    _inject_captures($code, $captures);
+    Devel::LexAlias::lexalias($code, $_, $captures->{$_}) for keys %$captures;
 
     return ($code, $e);
 }
@@ -245,28 +245,7 @@ sub _make_lexical_stub {
              . 'my ' . $tmpname . ' = $_[' . $index . ']; '
              . 'my sub ' . $name . ' { goto ' . $tmpname . ' }';
     }
-    elsif (HAS_DEVEL_LEXALIAS) {
-        return 'my ' . $key . ';';
-    }
-    else {
-        return 'our ' . $key . ';';
-    }
-}
-
-sub _inject_captures
-{
-    my ($code, $captures) = @_;
-
-    if (HAS_DEVEL_LEXALIAS) {
-        Devel::LexAlias::lexalias($code, $_, $captures->{$_}) for keys %$captures;
-    }
-    else {
-        no strict "refs";
-        for (keys %$captures) {
-            my $slot = "Eval::Closure::Sandbox_${Eval::Closure::SANDBOX_ID}::" . substr($_, 1);
-            *{$slot} = $captures->{$_};
-        }
-    }
+    return 'my ' . $key . ';';
 }
 
 sub _dump_source {
