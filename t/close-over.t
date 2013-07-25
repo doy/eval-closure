@@ -9,7 +9,8 @@ use Eval::Closure;
 
 use Test::Requires 'PadWalker';
 
-{
+SKIP: {
+    skip "Devel::LexAlias not available", 1 unless Eval::Closure::HAS_DEVEL_LEXALIAS;
     my $foo = [];
     my $env = { '$foo' => \$foo };
 
@@ -21,7 +22,8 @@ use Test::Requires 'PadWalker';
               "closed over the right things");
 }
 
-{
+SKIP: {
+    skip "Devel::LexAlias not available", 1 unless Eval::Closure::HAS_DEVEL_LEXALIAS;
     my $foo = {};
     my $bar = [];
     my $env = { '$foo' => \$bar, '$bar' => \$foo };
