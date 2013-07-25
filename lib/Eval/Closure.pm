@@ -256,7 +256,7 @@ sub _make_lexical_stub {
 sub _inject_captures
 {
     my ($code, $captures) = @_;
-    
+
     if (HAS_DEVEL_LEXALIAS) {
         Devel::LexAlias::lexalias($code, $_, $captures->{$_}) for keys %$captures;
     }
