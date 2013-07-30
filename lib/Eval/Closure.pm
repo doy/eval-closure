@@ -79,7 +79,7 @@ before lexical subs were available will throw an error.
 
 If set to true, the coderef returned closes over the variables referenced in
 the environment hashref. (This feature requires L<Devel::LexAlias>.) If set to
-false, the ccoderef closes over a I<< shallow copy >> of the variables.
+false, the coderef closes over a I<< shallow copy >> of the variables.
 
 If this argument is omitted, Eval::Closure will currently assume false, but
 this assumption may change in a future version.
