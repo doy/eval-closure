@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+
+0.11  2013-07-30
       - add "alias => 1" option for making closure variables actually alias the
         closed over variables (so the variable referenced in the environment
         hashref will actually be updated by changes made in the closure). (Toby
