@@ -8,7 +8,6 @@ use Exporter 'import';
 
 use Carp;
 use overload ();
-use Devel::LexAlias ();
 use Scalar::Util qw(reftype);
 use Try::Tiny;
 
@@ -76,6 +75,15 @@ sigil of C<&>. This will create a lexical sub in the evaluated code (see
 L<feature/The 'lexical_subs' feature>). Using a C<&> sigil on perl versions
 before lexical subs were available will throw an error.
 
+=item alias
+
+If set to true, the coderef returned closes over the variables referenced in
+the environment hashref. (This feature requires L<Devel::LexAlias>.) If set to
+false, the ccoderef closes over a I<< shallow copy >> of the variables.
+
+If this argument is omitted, Eval::Closure will currently assume false, but
+this assumption may change in a future version.
+
 =item description
 
 This lets you provide a bit more information in backtraces. Normally, when a
@@ -104,6 +112,9 @@ behavior so you get only the compilation error that Perl actually reported.
 sub eval_closure {
     my (%args) = @_;
 
+    # default to copying environment
+    $args{alias} = 0 if !exists $args{alias};
+
     $args{source} = _canonicalize_source($args{source});
     _validate_env($args{environment} ||= {});
 
@@ -111,7 +122,7 @@ sub eval_closure {
                   . $args{source}
         if defined $args{description} && !($^P & 0x10);
 
-    my ($code, $e) = _clean_eval_closure(@args{qw(source environment)});
+    my ($code, $e) = _clean_eval_closure(@args{qw(source environment alias)});
 
     if (!$code) {
         if ($args{terse_error}) {
@@ -180,15 +191,15 @@ sub _line_directive {
 }
 
 sub _clean_eval_closure {
-    my ($source, $captures) = @_;
+    my ($source, $captures, $alias) = @_;
 
     my @capture_keys = sort keys %$captures;
 
     if ($ENV{EVAL_CLOSURE_PRINT_SOURCE}) {
-        _dump_source(_make_compiler_source($source, @capture_keys));
+        _dump_source(_make_compiler_source($source, $alias, @capture_keys));
     }
 
-    my ($compiler, $e) = _make_compiler($source, @capture_keys);
+    my ($compiler, $e) = _make_compiler($source, $alias, @capture_keys);
     my $code;
     if (defined $compiler) {
         $code = $compiler->(@$captures{@capture_keys});
@@ -200,8 +211,12 @@ sub _clean_eval_closure {
         undef $code;
     }
 
-    Devel::LexAlias::lexalias($code, $_, $captures->{$_}) for keys %$captures;
-
+    if ($alias) {
+        require Devel::LexAlias;
+        Devel::LexAlias::lexalias($code, $_, $captures->{$_})
+            for grep !/^\&/, keys %$captures;
+    }
+    
     return ($code, $e);
 }
 
@@ -222,20 +237,20 @@ sub _clean_eval {
 $Eval::Closure::SANDBOX_ID = 0;
 
 sub _make_compiler_source {
-    my ($source, @capture_keys) = @_;
+    my ($source, $alias, @capture_keys) = @_;
     $Eval::Closure::SANDBOX_ID++;
     my $i = 0;
     return join "\n", (
         "package Eval::Closure::Sandbox_$Eval::Closure::SANDBOX_ID;",
         'sub {',
-            (map { _make_lexical_stub($_, $i++) } @capture_keys),
+            (map { _make_lexical_assignment($_, $i++, $alias) } @capture_keys),
             $source,
         '}',
     );
 }
 
-sub _make_lexical_stub {
-    my ($key, $index) = @_;
+sub _make_lexical_assignment {
+    my ($key, $index, $alias) = @_;
     my $sigil = substr($key, 0, 1);
     my $name = substr($key, 1);
     if (HAS_LEXICAL_SUBS && $sigil eq '&') {
@@ -245,7 +260,12 @@ sub _make_lexical_stub {
              . 'my ' . $tmpname . ' = $_[' . $index . ']; '
              . 'my sub ' . $name . ' { goto ' . $tmpname . ' }';
     }
-    return 'my ' . $key . ';';
+    if ($alias) {
+        return 'my ' . $key . ';';
+    }
+    else {
+        return 'my ' . $key . ' = ' . $sigil . '{$_[' . $index . ']};';
+    }
 }
 
 sub _dump_source {
