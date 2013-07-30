@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Test::Requires { "Devel::LexAlias" => "0.05" };
 
 use Eval::Closure;
 
