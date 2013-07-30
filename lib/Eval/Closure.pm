@@ -216,7 +216,7 @@ sub _clean_eval_closure {
         Devel::LexAlias::lexalias($code, $_, $captures->{$_})
             for grep !/^\&/, keys %$captures;
     }
-    
+
     return ($code, $e);
 }
 
