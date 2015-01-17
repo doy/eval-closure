@@ -3,7 +3,11 @@ use strict;
 use warnings;
 use Test::More;
 
-use Test::Requires '5.018';
+BEGIN {
+    if (!eval { require 5.018; 1 }) {
+        plan skip_all => "this test requires 5.18";
+    }
+}
 use 5.018;
 
 use Eval::Closure;
