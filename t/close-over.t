@@ -44,9 +44,9 @@ use Test::Requires 'PadWalker';
         $b = $b->OUTSIDE;
     }
     my @visible_in_outer_scope
-        = grep { $_ ne '&' }
+        = grep { defined and $_ ne '&' }
           map  { $_->PV }
-          grep { $_->isa('B::PV') }
+          grep { $_->can('PV') }
           map  { $_->PADLIST->ARRAYelt(0)->ARRAY }
           @scopes;
 

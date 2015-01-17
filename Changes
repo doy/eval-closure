@@ -1,6 +1,7 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+      - fix tests under blead (sprout, #4)
 
 0.11  2013-07-30
       - add "alias => 1" option for making closure variables actually alias the
