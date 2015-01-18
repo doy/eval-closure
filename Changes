@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+
+0.12  2015-01-17
       - fix tests under blead (sprout, #4)
 
 0.11  2013-07-30
