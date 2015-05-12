@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+
+0.13  2015-05-12
       - one more fix for blead (eserte, jplesnik, #6)
 
 0.12  2015-01-17
