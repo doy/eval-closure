@@ -171,11 +171,11 @@ sub _validate_env {
     for my $var (keys %$env) {
         if (HAS_LEXICAL_SUBS) {
             croak("Environment key '$var' should start with \@, \%, \$, or \&")
-                unless $var =~ /^([\@\%\$\&])/;
+                if index('$@%&', substr($var, 0, 1)) < 0;
         }
         else {
             croak("Environment key '$var' should start with \@, \%, or \$")
-                unless $var =~ /^([\@\%\$])/;
+                if index('$@%', substr($var, 0, 1)) < 0;
         }
         croak("Environment values must be references, not $env->{$var}")
             unless ref($env->{$var});
