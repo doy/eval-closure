@@ -214,7 +214,7 @@ sub _clean_eval_closure {
     if ($alias) {
         require Devel::LexAlias;
         Devel::LexAlias::lexalias($code, $_, $captures->{$_})
-            for grep !/^\&/, keys %$captures;
+            for grep index($_, '&')==-1, keys %$captures;
     }
 
     return ($code, $e);
