@@ -200,15 +200,23 @@ sub _clean_eval_closure {
     }
 
     my ($compiler, $e) = _make_compiler($source, $alias, @capture_keys);
-    my $code;
-    if (defined $compiler) {
-        $code = $compiler->(@$captures{@capture_keys});
-    }
+    return (undef, $e) unless defined $compiler;
 
-    if (defined($code) && (!ref($code) || ref($code) ne 'CODE')) {
-        $e = "The 'source' parameter must return a subroutine reference, "
-           . "not $code";
-        undef $code;
+    my $code = $compiler->(@$captures{@capture_keys});
+
+    if (!defined $code) {
+        return (
+            undef,
+            "The 'source' parameter must return a subroutine reference, "
+            . "not undef"
+        )
+    }
+    if (!ref($code) || ref($code) ne 'CODE') {
+        return (
+            undef,
+            "The 'source' parameter must return a subroutine reference, not "
+            . ref($code)
+        )
     }
 
     if ($alias) {
