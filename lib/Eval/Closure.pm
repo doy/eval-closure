@@ -193,7 +193,7 @@ sub _line_directive {
 sub _clean_eval_closure {
     my ($source, $captures, $alias) = @_;
 
-    my @capture_keys = sort keys %$captures;
+    my @capture_keys = keys %$captures;
 
     if ($ENV{EVAL_CLOSURE_PRINT_SOURCE}) {
         _dump_source(_make_compiler_source($source, $alias, @capture_keys));
