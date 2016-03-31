@@ -231,7 +231,7 @@ sub _clean_eval_closure {
 sub _make_compiler {
     my $source = _make_compiler_source(@_);
 
-    return @{ _clean_eval($source) };
+    _clean_eval($source)
 }
 
 sub _clean_eval {
@@ -239,7 +239,7 @@ sub _clean_eval {
     local $SIG{__DIE__};
     my $compiler = eval $_[0];
     my $e = $@;
-    [ $compiler, $e ];
+    ( $compiler, $e )
 }
 
 $Eval::Closure::SANDBOX_ID = 0;
