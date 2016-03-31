@@ -9,7 +9,6 @@ use Exporter 'import';
 use Carp;
 use overload ();
 use Scalar::Util qw(reftype);
-use Try::Tiny;
 
 use constant HAS_LEXICAL_SUBS => $] >= 5.018;
 
@@ -280,7 +279,8 @@ sub _dump_source {
     my ($source) = @_;
 
     my $output;
-    if (try { require Perl::Tidy }) {
+    local $@;
+    if (eval { require Perl::Tidy; 1 }) {
         Perl::Tidy::perltidy(
             source      => \$source,
             destination => \$output,
