@@ -1,6 +1,8 @@
 Revision history for Eval-Closure
 
 {{$NEXT}}
+
+0.14  2016-05-29
       - a couple minor optimizations (dolmen, #8)
 
 0.13  2015-05-12
